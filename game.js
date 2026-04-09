@@ -17,9 +17,9 @@
         { id: 'copays',       label: 'High copays' },
         { id: 'deductibles',  label: 'Deductibles' },
         { id: 'coinsurance',  label: 'Coinsurance' },
-        { id: 'pbm',          label: 'PBM rebates' },
+        { id: 'pbm',          label: 'Rebate-driven pricing' },
         { id: 'accumulators', label: 'Copay accumulators' },
-        { id: 'design',       label: 'Broken insurance design' },
+        { id: 'design',       label: 'Insurance that fails when patients need it most' },
         { id: 'pricecontrol', label: 'Price controls that weaken innovation' },
         { id: 'generics',     label: 'Delayed genericization' },
     ];
