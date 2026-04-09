@@ -177,6 +177,7 @@
             const avg = stats.times.length > 0
                 ? (stats.times.reduce((a, b) => a + b, 0) / stats.times.length).toFixed(1) + 's' : '--';
             $('#title-avg-time').textContent = avg;
+            $('#title-played').textContent = stats.games;
             $('#title-today-time').textContent = (stats.todayDate === getToday() && stats.todayTime !== null)
                 ? stats.todayTime.toFixed(1) + 's' : '--';
         } else {
