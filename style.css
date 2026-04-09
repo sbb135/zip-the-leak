@@ -311,7 +311,7 @@ html, body {
 /* ===================================================
    DASHBOARD
    =================================================== */
-.dash { text-align: center; padding: 24px 20px; max-width: 400px; animation: fadeUp .4s ease-out; }
+.dash { text-align: center; padding: 40px 20px 24px; max-width: 400px; animation: fadeUp .4s ease-out; }
 @keyframes fadeUp { 0% { transform: translateY(16px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 .dash-logo { width: 160px; display: block; margin: 0 auto 8px; filter: brightness(0) invert(1); opacity: .4; }
 .dash-hero { margin-bottom: 20px; }
