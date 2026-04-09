@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Zip the Leak — Fix Insurance Before Treatment Is Lost</title>
+    <meta name="description" content="A daily puzzle game. Seal the 8 insurance leaks that delay treatment for patients. No Patient Left Behind.">
+    <meta property="og:title" content="Zip the Leak — How Fast Can You Fix Insurance?">
+    <meta property="og:description" content="Seal all 8 leaks and beat the clock. #NoPatientLeftBehind">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ======== TITLE ======== -->
+    <div id="screen-title" class="screen active">
+        <div class="title-content">
+            <img src="nplb-logo.png" alt="NPLB" class="title-logo">
+            <div class="badge">NO PATIENT LEFT BEHIND</div>
+
+            <h1 class="title-main">
+                <span class="t-zip">ZIP</span>
+                <span class="t-the">THE</span>
+                <span class="t-leak">LEAK</span>
+            </h1>
+
+            <p class="subtitle">Connect the leaks 1 to 8 in order and fill every cell.</p>
+
+            <div class="daily-info">
+                <span id="daily-number" class="daily-num">DAILY PUZZLE #1</span>
+                <span id="daily-date" class="daily-date"></span>
+            </div>
+
+            <div id="title-stats" class="title-stats" style="display:none">
+                <div class="title-stat">
+                    <span class="title-stat-label">YOUR SCORE</span>
+                    <span id="title-today-time" class="title-stat-value title-stat-today">--</span>
+                </div>
+                <div class="title-stat">
+                    <span class="title-stat-label">BEST</span>
+                    <span id="title-best-time" class="title-stat-value">--</span>
+                </div>
+                <div class="title-stat">
+                    <span class="title-stat-label">AVG</span>
+                    <span id="title-avg-time" class="title-stat-value">--</span>
+                </div>
+            </div>
+
+            <button id="btn-legend" class="link-btn">What are the 8 leaks?</button>
+
+            <div class="title-actions">
+                <button id="btn-daily" class="btn-primary"><span class="btn-text">PLAY</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== LEGEND ======== -->
+    <div id="screen-legend" class="screen">
+        <div class="legend-wrap">
+            <h2 class="legend-title">THE 8 LEAKS</h2>
+            <p class="legend-sub">Insurance design failures that delay treatment</p>
+            <ol class="legend-list">
+                <li><strong>High copays</strong><span>Even after paying premiums, patients face costs high enough to delay filling prescriptions or starting treatment.</span></li>
+                <li><strong>Deductibles</strong><span>Patients delay care because they have to pay too much up front before coverage kicks in.</span></li>
+                <li><strong>Coinsurance</strong><span>Patients pay a percentage of every treatment cost, creating unpredictable and often unaffordable bills.</span></li>
+                <li><strong>PBM rebates</strong><span>Pharmacy benefit managers negotiate rebates that don't get passed to patients, keeping out-of-pocket costs high.</span></li>
+                <li><strong>Copay accumulators</strong><span>Manufacturer assistance no longer counts toward deductibles, leaving patients with sudden cost cliffs mid-year.</span></li>
+                <li><strong>Broken insurance design</strong><span>Plans structured to shift costs to patients rather than provide meaningful coverage when it matters most.</span></li>
+                <li><strong>Price controls that weaken innovation</strong><span>Policies that suppress drug prices can reduce incentives to develop treatments for the patients who need them most.</span></li>
+                <li><strong>Delayed genericization</strong><span>When generic alternatives are slow to reach the market, patients stay locked into higher-cost branded options longer.</span></li>
+            </ol>
+            <button id="btn-legend-close" class="btn-primary">GOT IT</button>
+        </div>
+    </div>
+
+    <!-- ======== GAME ======== -->
+    <div id="screen-game" class="screen">
+        <header class="game-hud">
+            <div id="game-mode-label" class="mode-label">DAILY PUZZLE #1</div>
+            <div class="timer-row">
+                <span id="hud-timer" class="timer">0.0</span><span class="timer-unit">s</span>
+            </div>
+            <div class="hud-stats">
+                <span class="hud-pill"><span class="hud-label">CELLS</span> <span id="hud-cells">0/25</span></span>
+                <span class="hud-pill"><span class="hud-label">LEAKS</span> <span id="hud-leaks">0/8</span></span>
+                <span class="hud-pill" id="hud-best-container" style="display:none"><span class="hud-label">BEST</span> <span id="hud-best">--</span></span>
+            </div>
+        </header>
+
+        <main class="game-area">
+            <div id="game-grid" class="grid"></div>
+            <div id="leak-legend-bar" class="legend-bar"></div>
+        </main>
+
+        <footer class="game-footer">
+            <button id="btn-undo" class="btn-game">↩ Undo</button>
+            <button id="btn-reset" class="btn-game">⟲ Reset</button>
+        </footer>
+    </div>
+
+    <!-- ======== DASHBOARD ======== -->
+    <div id="screen-dashboard" class="screen">
+        <div class="dash">
+            <img src="nplb-logo.png" alt="NPLB" class="dash-logo">
+            <div class="dash-hero">
+                <div class="dash-emoji">🛡️</div>
+                <h2 class="dash-headline">ALL 8 LEAKS SEALED</h2>
+                <div class="dash-time-row"><span id="dash-time" class="dash-time">0.0</span><span class="dash-time-unit">seconds</span></div>
+                <div id="dash-new-best" class="dash-badge" style="display:none">🏆 NEW BEST</div>
+                <div id="dash-daily-done" class="dash-daily" style="display:none"><span id="dash-daily-label">DAILY #1</span> COMPLETE</div>
+            </div>
+            <div class="dash-grid">
+                <div class="dash-card"><span class="dash-val" id="dash-best">--</span><span class="dash-lbl">Best</span></div>
+                <div class="dash-card"><span class="dash-val" id="dash-avg">--</span><span class="dash-lbl">Avg</span></div>
+                <div class="dash-card"><span class="dash-val" id="dash-games">0</span><span class="dash-lbl">Played</span></div>
+                <div class="dash-card"><span class="dash-val" id="dash-streak">0</span><span class="dash-lbl">Streak 🔥</span></div>
+            </div>
+            <blockquote class="dash-quote">"Patients don't need more skin in the game.<br>They need the leaks fixed."</blockquote>
+            <p class="dash-tags">#NoPatientLeftBehind · #FixInsurance</p>
+            <div class="dash-actions">
+                <button id="btn-share" class="btn-primary btn-linkedin"><span class="btn-text">SHARE ON LINKEDIN</span></button>
+                <button id="btn-practice-again" class="btn-primary"><span class="btn-text">PLAY AGAIN</span></button>
+                <button id="btn-home" class="btn-outline">HOME</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
