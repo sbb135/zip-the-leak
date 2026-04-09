@@ -185,10 +185,17 @@
         }
 
         if (stats.lastDailyDate === getToday()) {
-            $('#btn-daily').querySelector('.btn-text').textContent = 'PLAY';
+            $('#btn-daily').querySelector('.btn-text').textContent = 'COMPLETED ✓';
+            $('#btn-daily').classList.add('btn-completed');
         } else {
             $('#btn-daily').querySelector('.btn-text').textContent = 'PLAY';
+            $('#btn-daily').classList.remove('btn-completed');
         }
+    }
+
+    function showTodayResults() {
+        const stats = loadStats();
+        showDashboard(stats.todayTime || 0, false, stats);
     }
 
     // =========================================================================
@@ -547,11 +554,17 @@
     function init() {
         setupTitle();
 
-        $('#btn-daily').addEventListener('click', () => startGame('daily'));
+        $('#btn-daily').addEventListener('click', () => {
+            const stats = loadStats();
+            if (stats.lastDailyDate === getToday()) {
+                showTodayResults();
+            } else {
+                startGame('daily');
+            }
+        });
         $('#btn-legend').addEventListener('click', () => showScreen('legend'));
         $('#btn-legend-close').addEventListener('click', () => showScreen('title'));
 
-        $('#btn-practice-again').addEventListener('click', () => startGame('daily'));
         $('#btn-share').addEventListener('click', shareToLinkedIn);
         $('#btn-home').addEventListener('click', () => { setupTitle(); showScreen('title'); });
 

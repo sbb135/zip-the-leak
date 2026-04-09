@@ -96,6 +96,7 @@ html, body {
 }
 .btn-primary:hover { transform: scale(1.04); box-shadow: 0 4px 24px rgba(224,116,96,.3); }
 .btn-primary:active { transform: scale(.97); }
+.btn-completed { background: var(--green); opacity: .8; }
 
 .btn-outline {
     font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
