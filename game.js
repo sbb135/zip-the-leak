@@ -659,37 +659,44 @@
         html += `<div class="lb-stat"><div class="lb-stat-val">${stats.streak || 0} 🔥</div><div class="lb-stat-lbl">Streak</div></div>`;
         html += '</div>';
 
-        // ---- Card 3: Position (only if we have global data + your time) ----
-        if (!isLocal && times.length > 1 && myTime !== null) {
-            const fastest = times[0];
-            const slowest = times[times.length - 1];
-            const fasterCount = times.filter(t => t >= myTime).length;
-            const percentile = Math.round((fasterCount / times.length) * 100);
-            const range = slowest - fastest;
-            let markerPct = range > 0 ? Math.round(((myTime - fastest) / range) * 100) : 50;
-            markerPct = Math.max(4, Math.min(96, markerPct));
-
+        // ---- Card 3: Today's ranking (always show if connected to API) ----
+        if (!isLocal) {
             html += '<div class="lb-card">';
             html += `<div class="lb-section-label">TODAY'S RANKING</div>`;
-            html += `<div class="lb-pct-text">Faster than <strong>${percentile}%</strong> of ${playerCount} players</div>`;
-            html += `<div class="lb-position">
-                <div class="lb-position-bar">
-                    <div class="lb-position-marker" style="left:${markerPct}%">
-                        <div class="lb-marker-dot"></div>
+            html += `<div class="lb-pct-sub">${playerCount} player${playerCount === 1 ? '' : 's'} today</div>`;
+
+            if (myTime !== null && times.length > 1) {
+                const fastest = times[0];
+                const slowest = times[times.length - 1];
+                const fasterCount = times.filter(t => t >= myTime).length;
+                const percentile = Math.round((fasterCount / times.length) * 100);
+                const range = slowest - fastest;
+                let markerPct = range > 0 ? Math.round(((myTime - fastest) / range) * 100) : 50;
+                markerPct = Math.max(4, Math.min(96, markerPct));
+
+                html += `<div class="lb-pct-text">Faster than <strong>${percentile}%</strong> of players</div>`;
+                html += `<div class="lb-position">
+                    <div class="lb-position-bar">
+                        <div class="lb-position-marker" style="left:${markerPct}%">
+                            <div class="lb-marker-dot"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="lb-position-ends">
-                    <span>🏆 ${fastest.toFixed(1)}s</span>
-                    <span>${slowest.toFixed(1)}s</span>
-                </div>
-            </div>`;
+                    <div class="lb-position-ends">
+                        <span>🏆 ${fastest.toFixed(1)}s</span>
+                        <span>${slowest.toFixed(1)}s</span>
+                    </div>
+                </div>`;
+            } else if (playerCount <= 1) {
+                html += '<div class="lb-pct-text">You\'re the first today! 🎉</div>';
+                html += '<div class="lb-pct-sub">Share with friends to see how you compare</div>';
+            }
             html += '</div>';
-        } else if (isLocal && myTime !== null && times.length > 1) {
+        } else if (isLocal && myTime !== null) {
             // Local-only: show personal best context
-            const fastest = times[0];
+            const fastest = times.length > 0 ? times[0] : null;
             html += '<div class="lb-card">';
             html += `<div class="lb-section-label">YOUR HISTORY</div>`;
-            html += `<div class="lb-pct-text">Personal best: <strong>${fastest.toFixed(1)}s</strong></div>`;
+            if (fastest !== null) html += `<div class="lb-pct-text">Personal best: <strong>${fastest.toFixed(1)}s</strong></div>`;
             html += `<div class="lb-pct-sub">${stats.games} games played total</div>`;
             html += '</div>';
         }
