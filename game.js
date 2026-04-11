@@ -622,7 +622,6 @@
                 times = data.scores.map(s => s.time).sort((a, b) => a - b);
             }
         } catch (e) {
-            // API not available (local dev) — fall back to localStorage history
             console.log('API unavailable, using local stats');
             isLocal = true;
             const stats = loadStats();
@@ -639,75 +638,52 @@
         const stats = loadStats();
         const myTime = (stats.todayDate === getToday() && stats.todayTime !== null) ? stats.todayTime : null;
 
-        // Build distribution visualization
-        const buckets = buildBuckets(times);
+        const fastest = times[0];
+        const slowest = times[times.length - 1];
         let percentile = null;
+        let markerPct = 50;
+
         if (myTime !== null) {
             const fasterCount = times.filter(t => t >= myTime).length;
             percentile = Math.round((fasterCount / times.length) * 100);
+            // Position on bar: 0% = fastest, 100% = slowest
+            const range = slowest - fastest;
+            markerPct = range > 0 ? Math.round(((myTime - fastest) / range) * 100) : 50;
+            markerPct = Math.max(2, Math.min(98, markerPct)); // Keep marker visible
         }
 
         let html = '';
 
-        // Show percentile banner if player has a score today
-        if (percentile !== null) {
-            html += `<div class="lb-percentile">
-                <div class="lb-pct-big">${percentile}%</div>
-                <div class="lb-pct-label">You were faster than ${percentile}% of ${isLocal ? 'your past games' : "today's players"}</div>
-                <div class="lb-pct-time">Your time: ${myTime.toFixed(1)}s</div>
+        // Your result
+        if (myTime !== null) {
+            html += `<div class="lb-your-result">
+                <div class="lb-your-time">${myTime.toFixed(1)}s</div>
+                <div class="lb-your-label">Your time</div>
             </div>`;
+        }
+
+        // Simple position bar (LinkedIn-style)
+        if (percentile !== null) {
+            html += `<div class="lb-position">
+                <div class="lb-position-bar">
+                    <div class="lb-position-fill"></div>
+                    <div class="lb-position-marker" style="left:${markerPct}%">
+                        <div class="lb-marker-dot"></div>
+                        <div class="lb-marker-label">You</div>
+                    </div>
+                </div>
+                <div class="lb-position-ends">
+                    <span>${fastest.toFixed(1)}s</span>
+                    <span>${slowest.toFixed(1)}s</span>
+                </div>
+            </div>`;
+
+            html += `<div class="lb-pct-text">Faster than <strong>${percentile}%</strong> of ${isLocal ? 'your past games' : "today's players"}</div>`;
         }
 
         html += `<div class="lb-total">${times.length} ${isLocal ? 'game' : 'player'}${times.length === 1 ? '' : 's'} ${isLocal ? 'played' : 'today'}</div>`;
 
-        // Histogram bars
-        html += '<div class="lb-histogram">';
-        const maxCount = Math.max(...buckets.map(b => b.count));
-        for (const bucket of buckets) {
-            const pct = maxCount > 0 ? (bucket.count / maxCount) * 100 : 0;
-            const isMyBucket = myTime !== null && myTime >= bucket.min && myTime < bucket.max;
-            html += `<div class="lb-bar-row${isMyBucket ? ' lb-bar-mine' : ''}">
-                <span class="lb-bar-label">${bucket.label}</span>
-                <div class="lb-bar-track">
-                    <div class="lb-bar-fill" style="width:${pct}%"></div>
-                </div>
-                <span class="lb-bar-count">${bucket.count}</span>
-            </div>`;
-        }
-        html += '</div>';
-
-        // Fastest times list (anonymous)
-        html += `<div class="lb-fastest-title">⚡ ${isLocal ? 'Your Fastest Games' : 'Fastest Times Today'}</div>`;
-        const top10 = times.slice(0, 10);
-        for (let i = 0; i < top10.length; i++) {
-            const isMe = myTime !== null && Math.abs(top10[i] - myTime) < 0.05;
-            html += `<div class="lb-item${isMe ? ' lb-item-me' : ''}">
-                <div class="lb-item-left">
-                    <span class="lb-rank">${i + 1}</span>
-                    <span class="lb-name">${isMe ? '⭐ You' : (isLocal ? 'Past game' : 'Player')}</span>
-                </div>
-                <span class="lb-time">${top10[i].toFixed(1)}s</span>
-            </div>`;
-        }
-
         listEl.innerHTML = html;
-    }
-
-    function buildBuckets(times) {
-        if (times.length === 0) return [];
-        const min = Math.floor(times[0]);
-        const max = Math.ceil(times[times.length - 1]);
-        const range = max - min;
-        const bucketSize = Math.max(5, Math.ceil(range / 6)); // 5-second buckets, at least 6
-        const buckets = [];
-        for (let start = min; start < max + bucketSize; start += bucketSize) {
-            const end = start + bucketSize;
-            const count = times.filter(t => t >= start && t < end).length;
-            if (count > 0 || buckets.length > 0) {
-                buckets.push({ min: start, max: end, label: `${start}-${end}s`, count });
-            }
-        }
-        return buckets;
     }
 
     function openLeaderboard(fromScreen) {
