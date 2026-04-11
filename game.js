@@ -589,7 +589,7 @@
 
 I sealed all 8 insurance leaks in ${time} seconds!
 
-These are the 8 leaks that delay treatment for patients:
+These are the 8 leaks that delay treatment for insured patients:
 ${leakList}
 
 Can you fix them faster than I did? 👇
