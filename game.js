@@ -584,14 +584,20 @@
         const dayInfo = state.mode === 'daily' ? `Daily Puzzle #${state.dayNum}` : `Daily Puzzle #${getDailyPuzzle().dayNum}`;
         const best = stats.best ? stats.best.toFixed(1) : time;
 
-        const leakList = LEAK_LABELS.map((l, i) => `${i + 1}. ${l.label}`).join('\n');
+        const insuranceLeaks = LEAK_LABELS.slice(0, 6).map((l, i) => `${i + 1}. ${l.label}`).join('\n');
+        const policyFailures = LEAK_LABELS.slice(6).map((l, i) => `${i + 7}. ${l.label}`).join('\n');
 
         const text = `🩹 Zip the Leak — ${dayInfo}
 
 I sealed all 8 insurance leaks in ${time} seconds!
 
 These are the 8 leaks that delay treatment for insured patients:
-${leakList}
+
+🏥 INSURANCE LEAKS
+${insuranceLeaks}
+
+⚖️ POLICY FAILURES
+${policyFailures}
 
 Can you fix them faster than I did? 👇
 🔗 ${APP_URL}
