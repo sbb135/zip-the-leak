@@ -571,7 +571,11 @@
         if (!el) return;
         el.innerHTML = Object.values(state.leakCells)
             .sort((a, b) => a.num - b.num)
-            .map(l => `<div class="legend-bar-item${l.num <= state.sealedCount ? ' sealed' : ''}"><span class="legend-bar-num">${l.num}</span><span class="legend-bar-label">${l.label}</span></div>`)
+            .map(l => {
+                const sealed = l.num <= state.sealedCount ? ' sealed' : '';
+                const category = l.num > 6 ? ' policy' : '';
+                return `<div class="legend-bar-item${sealed}${category}"><span class="legend-bar-num">${l.num}</span><span class="legend-bar-label">${l.label}</span></div>`;
+            })
             .join('');
     }
 

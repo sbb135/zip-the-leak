@@ -318,6 +318,7 @@ html, body {
     font-size: 9px; font-weight: 800; font-family: var(--display);
     flex-shrink: 0;
 }
+.legend-bar-item.policy .legend-bar-num { background: var(--gold); }
 .legend-bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Footer */
