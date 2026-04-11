@@ -601,8 +601,10 @@ Can you fix them faster than I did? 👇
 
 #NoPatientLeftBehind #FixInsurance #NPLB`;
 
-        navigator.clipboard.writeText(text).catch(() => {});
+        // Open LinkedIn FIRST (must be synchronous from click to avoid popup block)
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`, '_blank');
+        // Then copy the share text to clipboard
+        navigator.clipboard.writeText(text).catch(() => {});
     }
 
     // =========================================================================
