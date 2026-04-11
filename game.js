@@ -11,6 +11,7 @@
     const NUM_LEAKS = 8;
     const LAUNCH_DATE = '2026-04-09';
     const STORAGE_KEY = 'zip-the-leak-stats-v2';
+    const APP_URL = 'https://nplb-zip-the-leak-fix-insurance.vercel.app';
 
     // Exact labels as specified — these appear on the grid and in the legend
     const LEAK_LABELS = [
@@ -92,8 +93,43 @@
         }
 
         // 8 leaks spread across the 25-cell path
-        const leakPositions = [0, 3, 6, 9, 12, 15, 18, 24];
+        // Progressive difficulty: later puzzles cluster leaks closer together,
+        // making the path between them trickier to plan
+        const leakPositions = getLeakPositions(seed);
         return { path: path.slice(), leakPositions };
+    }
+
+    // =========================================================================
+    // PROGRESSIVE DIFFICULTY
+    // =========================================================================
+    function getLeakPositions(seed) {
+        const today = getToday();
+        const dayNum = getDayNumber(today);
+        
+        // Week 1 (days 1-7): Evenly spaced — easy
+        // Week 2 (days 8-14): Slightly tighter spacing
+        // Week 3+ (days 15+): Leaks can cluster, forcing harder path planning
+        if (dayNum <= 7) {
+            return [0, 3, 6, 9, 12, 15, 18, 24];
+        } else if (dayNum <= 14) {
+            return [0, 2, 5, 8, 11, 14, 19, 24];
+        } else if (dayNum <= 21) {
+            return [0, 2, 4, 7, 10, 15, 20, 24];
+        } else {
+            // After week 3: seeded-random positioning for variety + difficulty
+            const rng = mulberry32(seed + 999);
+            const positions = [0, 24]; // Always anchor start and end
+            const pool = [];
+            for (let i = 1; i < 24; i++) pool.push(i);
+            // Shuffle and pick 6 interior positions
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            positions.push(...pool.slice(0, 6));
+            positions.sort((a, b) => a - b);
+            return positions;
+        }
     }
 
     // =========================================================================
@@ -139,7 +175,7 @@
     let state = {};
     const $ = s => document.querySelector(s);
     const gridEl = $('#game-grid');
-    const screens = { title: $('#screen-title'), legend: $('#screen-legend'), game: $('#screen-game'), dashboard: $('#screen-dashboard') };
+    const screens = { title: $('#screen-title'), legend: $('#screen-legend'), game: $('#screen-game'), dashboard: $('#screen-dashboard'), leaderboard: $('#screen-leaderboard') };
 
     function key(r, c) { return `${r},${c}`; }
     function adj(a, b) { return (Math.abs(a.row - b.row) + Math.abs(a.col - b.col)) === 1; }
@@ -452,6 +488,12 @@
         }
 
         saveStats(stats);
+
+        // Auto-submit anonymous score to the global distribution
+        if (state.mode === 'daily') {
+            submitAnonymousScore(elapsed, state.dayNum).catch(() => {});
+        }
+
         setTimeout(() => showDashboard(elapsed, isNewBest, stats), cells.length * 20 + 400);
     }
 
@@ -534,18 +576,144 @@
     }
 
     // =========================================================================
-    // SHARE
+    // SHARE — includes app URL and score in the LinkedIn post
     // =========================================================================
     function shareToLinkedIn() {
         const time = state.finalTime.toFixed(1);
         const stats = loadStats();
         const dayInfo = state.mode === 'daily' ? `Daily Puzzle #${state.dayNum}` : 'Practice';
-        const leakList = LEAK_LABELS.map(l => l.label.toLowerCase()).join(' · ');
 
-        const text = `🩹 Zip the Leak — ${dayInfo}\n\nI sealed all 8 insurance leaks in ${time} seconds.\n\n${leakList}\n\n"Patients don't need more skin in the game. They need the leaks fixed."\n\n🔥 Streak: ${stats.streak || 0} days | Best: ${stats.best.toFixed(1)}s\n\n#NoPatientLeftBehind #FixInsurance`;
+        const text = `🩹 Zip the Leak — ${dayInfo}\n\nI sealed all 8 insurance leaks in ${time} seconds! Can you beat my time?\n\n🔗 Play now: ${APP_URL}\n\n"Patients don't need more skin in the game. They need the leaks fixed."\n\n🔥 Streak: ${stats.streak || 0} days | Best: ${stats.best.toFixed(1)}s\n\n#NoPatientLeftBehind #FixInsurance`;
 
         navigator.clipboard.writeText(text).catch(() => {});
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank');
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`, '_blank');
+    }
+
+    // =========================================================================
+    // ANONYMOUS SCORE DISTRIBUTION (no names needed)
+    // =========================================================================
+    let prevScreen = 'title';
+
+    async function submitAnonymousScore(time, dayNum) {
+        try {
+            await fetch('/api/submit-score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ time, dayNum })
+            });
+        } catch(e) {
+            console.error('Score submit failed (will retry on next play):', e);
+        }
+    }
+
+    async function loadScoreDistribution() {
+        const listEl = $('#leaderboard-list');
+        listEl.innerHTML = '<div class="lb-loading">Loading scores...</div>';
+
+        let times = [];
+        let isLocal = false;
+
+        try {
+            const todayDayNum = getDailyPuzzle().dayNum;
+            const res = await fetch(`/api/get-leaderboard?mode=daily&dayNum=${todayDayNum}`);
+            if (!res.ok) throw new Error('API returned ' + res.status);
+            const data = await res.json();
+            if (data.scores && data.scores.length > 0) {
+                times = data.scores.map(s => s.time).sort((a, b) => a - b);
+            }
+        } catch (e) {
+            // API not available (local dev) — fall back to localStorage history
+            console.log('API unavailable, using local stats');
+            isLocal = true;
+            const stats = loadStats();
+            if (stats.times && stats.times.length > 0) {
+                times = stats.times.slice().sort((a, b) => a - b);
+            }
+        }
+
+        if (times.length === 0) {
+            listEl.innerHTML = '<div class="lb-loading">No scores yet. Play today\'s puzzle first!</div>';
+            return;
+        }
+
+        const stats = loadStats();
+        const myTime = (stats.todayDate === getToday() && stats.todayTime !== null) ? stats.todayTime : null;
+
+        // Build distribution visualization
+        const buckets = buildBuckets(times);
+        let percentile = null;
+        if (myTime !== null) {
+            const fasterCount = times.filter(t => t >= myTime).length;
+            percentile = Math.round((fasterCount / times.length) * 100);
+        }
+
+        let html = '';
+
+        // Show percentile banner if player has a score today
+        if (percentile !== null) {
+            html += `<div class="lb-percentile">
+                <div class="lb-pct-big">${percentile}%</div>
+                <div class="lb-pct-label">You were faster than ${percentile}% of ${isLocal ? 'your past games' : "today's players"}</div>
+                <div class="lb-pct-time">Your time: ${myTime.toFixed(1)}s</div>
+            </div>`;
+        }
+
+        html += `<div class="lb-total">${times.length} ${isLocal ? 'game' : 'player'}${times.length === 1 ? '' : 's'} ${isLocal ? 'played' : 'today'}</div>`;
+
+        // Histogram bars
+        html += '<div class="lb-histogram">';
+        const maxCount = Math.max(...buckets.map(b => b.count));
+        for (const bucket of buckets) {
+            const pct = maxCount > 0 ? (bucket.count / maxCount) * 100 : 0;
+            const isMyBucket = myTime !== null && myTime >= bucket.min && myTime < bucket.max;
+            html += `<div class="lb-bar-row${isMyBucket ? ' lb-bar-mine' : ''}">
+                <span class="lb-bar-label">${bucket.label}</span>
+                <div class="lb-bar-track">
+                    <div class="lb-bar-fill" style="width:${pct}%"></div>
+                </div>
+                <span class="lb-bar-count">${bucket.count}</span>
+            </div>`;
+        }
+        html += '</div>';
+
+        // Fastest times list (anonymous)
+        html += `<div class="lb-fastest-title">⚡ ${isLocal ? 'Your Fastest Games' : 'Fastest Times Today'}</div>`;
+        const top10 = times.slice(0, 10);
+        for (let i = 0; i < top10.length; i++) {
+            const isMe = myTime !== null && Math.abs(top10[i] - myTime) < 0.05;
+            html += `<div class="lb-item${isMe ? ' lb-item-me' : ''}">
+                <div class="lb-item-left">
+                    <span class="lb-rank">${i + 1}</span>
+                    <span class="lb-name">${isMe ? '⭐ You' : (isLocal ? 'Past game' : 'Player')}</span>
+                </div>
+                <span class="lb-time">${top10[i].toFixed(1)}s</span>
+            </div>`;
+        }
+
+        listEl.innerHTML = html;
+    }
+
+    function buildBuckets(times) {
+        if (times.length === 0) return [];
+        const min = Math.floor(times[0]);
+        const max = Math.ceil(times[times.length - 1]);
+        const range = max - min;
+        const bucketSize = Math.max(5, Math.ceil(range / 6)); // 5-second buckets, at least 6
+        const buckets = [];
+        for (let start = min; start < max + bucketSize; start += bucketSize) {
+            const end = start + bucketSize;
+            const count = times.filter(t => t >= start && t < end).length;
+            if (count > 0 || buckets.length > 0) {
+                buckets.push({ min: start, max: end, label: `${start}-${end}s`, count });
+            }
+        }
+        return buckets;
+    }
+
+    function openLeaderboard(fromScreen) {
+        prevScreen = fromScreen;
+        showScreen('leaderboard');
+        loadScoreDistribution();
     }
 
     // =========================================================================
@@ -567,6 +735,10 @@
 
         $('#btn-share').addEventListener('click', shareToLinkedIn);
         $('#btn-home').addEventListener('click', () => { setupTitle(); showScreen('title'); });
+
+        $('#btn-title-leaderboard').addEventListener('click', () => openLeaderboard('title'));
+        $('#btn-dash-leaderboard').addEventListener('click', () => openLeaderboard('dashboard'));
+        $('#btn-leaderboard-close').addEventListener('click', () => showScreen(prevScreen));
 
         $('#btn-undo').addEventListener('click', undoLast);
         $('#btn-reset').addEventListener('click', resetPath);

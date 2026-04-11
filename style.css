@@ -388,6 +388,97 @@ html, body {
 }
 
 /* ===================================================
+   SCORE DISTRIBUTION & LEADERBOARD
+   =================================================== */
+.dash-actions-row { display: flex; gap: 10px; width: 100%; justify-content: center; }
+
+#screen-leaderboard { align-items: flex-start; padding: 40px 0; }
+.leaderboard-wrap {
+    display: flex; flex-direction: column; height: 85vh; max-height: 700px;
+}
+.leaderboard-list {
+    flex: 1; overflow-y: auto; background: rgba(26,63,115,.06);
+    border: 1px solid rgba(26,63,115,.12); border-radius: var(--radius);
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 24px;
+}
+.lb-loading { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+
+/* Percentile banner */
+.lb-percentile {
+    text-align: center; padding: 16px;
+    background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(37,99,235,.08));
+    border: 1px solid rgba(16,185,129,.25);
+    border-radius: var(--radius); margin-bottom: 4px;
+}
+.lb-pct-big {
+    font-family: var(--display); font-size: 42px; font-weight: 900;
+    color: var(--green-light); line-height: 1;
+}
+.lb-pct-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.lb-pct-time { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+/* Total players */
+.lb-total {
+    font-family: var(--display); font-size: 10px; font-weight: 700;
+    letter-spacing: 2px; color: var(--dim); text-align: center;
+}
+
+/* Histogram */
+.lb-histogram {
+    display: flex; flex-direction: column; gap: 6px; padding: 4px 0;
+}
+.lb-bar-row {
+    display: flex; align-items: center; gap: 8px;
+}
+.lb-bar-label {
+    font-family: var(--display); font-size: 10px; font-weight: 600;
+    color: var(--muted); width: 50px; text-align: right; flex-shrink: 0;
+}
+.lb-bar-track {
+    flex: 1; height: 20px; background: rgba(255,255,255,.04);
+    border-radius: 6px; overflow: hidden;
+}
+.lb-bar-fill {
+    height: 100%; background: var(--navy-light); border-radius: 6px;
+    min-width: 3px; transition: width .4s ease;
+}
+.lb-bar-mine .lb-bar-fill { background: var(--green); }
+.lb-bar-mine .lb-bar-label { color: var(--green-light); }
+.lb-bar-count {
+    font-family: var(--display); font-size: 10px; font-weight: 800;
+    color: var(--white); width: 22px; flex-shrink: 0;
+}
+
+/* Fastest times heading */
+.lb-fastest-title {
+    font-family: var(--display); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; color: var(--gold); text-align: center;
+    margin-top: 4px;
+}
+
+/* Fastest times list */
+.lb-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; background: rgba(255,255,255,.03);
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,.05);
+}
+.lb-item-me {
+    background: rgba(16,185,129,.08);
+    border-color: rgba(16,185,129,.2);
+}
+.lb-item-left { display: flex; align-items: center; gap: 12px; }
+.lb-rank {
+    font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--coral); width: 20px; text-align: center;
+}
+.lb-item:nth-child(2) .lb-rank { color: var(--gold); font-size: 16px; }
+.lb-item:nth-child(3) .lb-rank { color: #cbd5e1; }
+.lb-item:nth-child(4) .lb-rank { color: #b45309; }
+
+.lb-name { font-weight: 600; font-size: 13px; color: var(--white); }
+.lb-time { font-family: var(--display); font-weight: 800; font-size: 13px; color: var(--green-light); }
+
+/* ===================================================
    RESPONSIVE
    =================================================== */
 @media (max-width: 420px) {

@@ -67,6 +67,7 @@
 
             <div class="title-actions">
                 <button id="btn-daily" class="btn-primary"><span class="btn-text">PLAY</span></button>
+                <button id="btn-title-leaderboard" class="btn-outline">LEADERBOARD</button>
             </div>
         </div>
     </div>
@@ -94,6 +95,20 @@
             </div>
 
             <button id="btn-legend-close" class="btn-primary">GOT IT</button>
+        </div>
+    </div>
+
+    <!-- ======== LEADERBOARD ======== -->
+    <div id="screen-leaderboard" class="screen">
+        <div class="legend-wrap leaderboard-wrap">
+            <h2 class="legend-title">TODAY'S SCORES</h2>
+            <p class="legend-sub">See how you compare with other players</p>
+
+            <div id="leaderboard-list" class="leaderboard-list">
+                <div class="lb-loading">Loading scores...</div>
+            </div>
+
+            <button id="btn-leaderboard-close" class="btn-outline">BACK</button>
         </div>
     </div>
 
@@ -151,9 +166,11 @@
             </blockquote>
             <p class="dash-tags">#NoPatientLeftBehind · #FixInsurance</p>
             <div class="dash-actions">
-                <button id="btn-share" class="btn-primary btn-linkedin"><span class="btn-text">SHARE ON
-                        LINKEDIN</span></button>
-                <button id="btn-home" class="btn-outline">HOME</button>
+                <button id="btn-share" class="btn-primary btn-linkedin"><span class="btn-text">SHARE ON LINKEDIN</span></button>
+                <div class="dash-actions-row">
+                    <button id="btn-dash-leaderboard" class="btn-outline">TODAY'S SCORES</button>
+                    <button id="btn-home" class="btn-outline">HOME</button>
+                </div>
             </div>
         </div>
     </div>
