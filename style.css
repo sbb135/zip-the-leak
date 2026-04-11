@@ -509,10 +509,12 @@ html, body {
 /* Category headers in legend */
 .legend-category {
     font-family: var(--display); font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; color: var(--coral);
+    letter-spacing: 2px;
     margin: 20px 0 8px 0; text-align: left;
 }
 .legend-category:first-of-type { margin-top: 0; }
+.legend-cat-leak { color: var(--coral); }
+.legend-cat-policy { color: var(--gold); }
 /* ===================================================
    RESPONSIVE
    =================================================== */
