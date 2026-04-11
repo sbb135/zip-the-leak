@@ -607,11 +607,12 @@
     }
 
     async function loadScoreDistribution() {
-        const listEl = $('#leaderboard-list');
-        listEl.innerHTML = '<div class="lb-loading">Loading scores...</div>';
+        const contentEl = $('#leaderboard-content');
+        contentEl.innerHTML = '<div class="lb-loading">Loading...</div>';
 
         let times = [];
         let isLocal = false;
+        let playerCount = 0;
 
         try {
             const todayDayNum = getDailyPuzzle().dayNum;
@@ -620,6 +621,7 @@
             const data = await res.json();
             if (data.scores && data.scores.length > 0) {
                 times = data.scores.map(s => s.time).sort((a, b) => a - b);
+                playerCount = times.length;
             }
         } catch (e) {
             console.log('API unavailable, using local stats');
@@ -630,60 +632,69 @@
             }
         }
 
-        if (times.length === 0) {
-            listEl.innerHTML = '<div class="lb-loading">No scores yet. Play today\'s puzzle first!</div>';
-            return;
-        }
-
         const stats = loadStats();
         const myTime = (stats.todayDate === getToday() && stats.todayTime !== null) ? stats.todayTime : null;
-
-        const fastest = times[0];
-        const slowest = times[times.length - 1];
-        let percentile = null;
-        let markerPct = 50;
-
-        if (myTime !== null) {
-            const fasterCount = times.filter(t => t >= myTime).length;
-            percentile = Math.round((fasterCount / times.length) * 100);
-            // Position on bar: 0% = fastest, 100% = slowest
-            const range = slowest - fastest;
-            markerPct = range > 0 ? Math.round(((myTime - fastest) / range) * 100) : 50;
-            markerPct = Math.max(2, Math.min(98, markerPct)); // Keep marker visible
-        }
+        const daily = getDailyPuzzle();
+        $('#lb-subtitle').textContent = `Daily Puzzle #${daily.dayNum}`;
 
         let html = '';
 
-        // Your result
+        // ---- Card 1: Your time ----
+        html += '<div class="lb-card lb-card-hero">';
         if (myTime !== null) {
-            html += `<div class="lb-your-result">
-                <div class="lb-your-time">${myTime.toFixed(1)}s</div>
-                <div class="lb-your-label">Your time</div>
-            </div>`;
+            html += `<div class="lb-hero-time">${myTime.toFixed(1)}<span class="lb-hero-unit">s</span></div>`;
+            html += '<div class="lb-hero-label">Your time today</div>';
+        } else {
+            html += '<div class="lb-hero-time">--</div>';
+            html += '<div class="lb-hero-label">Play today\'s puzzle to see your time</div>';
         }
+        html += '</div>';
 
-        // Simple position bar (LinkedIn-style)
-        if (percentile !== null) {
+        // ---- Card 2: Your stats row ----
+        html += '<div class="lb-card lb-stats-row">';
+        html += `<div class="lb-stat"><div class="lb-stat-val">${stats.best !== null ? stats.best.toFixed(1) + 's' : '--'}</div><div class="lb-stat-lbl">Best</div></div>`;
+        const avg = stats.times.length > 0 ? (stats.times.reduce((a, b) => a + b, 0) / stats.times.length).toFixed(1) + 's' : '--';
+        html += `<div class="lb-stat"><div class="lb-stat-val">${avg}</div><div class="lb-stat-lbl">Avg</div></div>`;
+        html += `<div class="lb-stat"><div class="lb-stat-val">${stats.games}</div><div class="lb-stat-lbl">Played</div></div>`;
+        html += `<div class="lb-stat"><div class="lb-stat-val">${stats.streak || 0} 🔥</div><div class="lb-stat-lbl">Streak</div></div>`;
+        html += '</div>';
+
+        // ---- Card 3: Position (only if we have global data + your time) ----
+        if (!isLocal && times.length > 1 && myTime !== null) {
+            const fastest = times[0];
+            const slowest = times[times.length - 1];
+            const fasterCount = times.filter(t => t >= myTime).length;
+            const percentile = Math.round((fasterCount / times.length) * 100);
+            const range = slowest - fastest;
+            let markerPct = range > 0 ? Math.round(((myTime - fastest) / range) * 100) : 50;
+            markerPct = Math.max(4, Math.min(96, markerPct));
+
+            html += '<div class="lb-card">';
+            html += `<div class="lb-section-label">TODAY'S RANKING</div>`;
+            html += `<div class="lb-pct-text">Faster than <strong>${percentile}%</strong> of ${playerCount} players</div>`;
             html += `<div class="lb-position">
                 <div class="lb-position-bar">
-                    <div class="lb-position-fill"></div>
                     <div class="lb-position-marker" style="left:${markerPct}%">
                         <div class="lb-marker-dot"></div>
-                        <div class="lb-marker-label">You</div>
                     </div>
                 </div>
                 <div class="lb-position-ends">
-                    <span>${fastest.toFixed(1)}s</span>
+                    <span>🏆 ${fastest.toFixed(1)}s</span>
                     <span>${slowest.toFixed(1)}s</span>
                 </div>
             </div>`;
-
-            html += `<div class="lb-pct-text">Faster than <strong>${percentile}%</strong> of ${isLocal ? 'your past games' : "today's players"}</div>`;
+            html += '</div>';
+        } else if (isLocal && myTime !== null && times.length > 1) {
+            // Local-only: show personal best context
+            const fastest = times[0];
+            html += '<div class="lb-card">';
+            html += `<div class="lb-section-label">YOUR HISTORY</div>`;
+            html += `<div class="lb-pct-text">Personal best: <strong>${fastest.toFixed(1)}s</strong></div>`;
+            html += `<div class="lb-pct-sub">${stats.games} games played total</div>`;
+            html += '</div>';
         }
 
-        html += `<div class="lb-total">${times.length} ${isLocal ? 'game' : 'player'}${times.length === 1 ? '' : 's'} ${isLocal ? 'played' : 'today'}</div>`;
-
-        listEl.innerHTML = html;
+        contentEl.innerHTML = html;
     }
 
     function openLeaderboard(fromScreen) {

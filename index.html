@@ -100,15 +100,17 @@
 
     <!-- ======== LEADERBOARD ======== -->
     <div id="screen-leaderboard" class="screen">
-        <div class="legend-wrap leaderboard-wrap">
-            <h2 class="legend-title">TODAY'S SCORES</h2>
-            <p class="legend-sub">See how you compare with other players</p>
-
-            <div id="leaderboard-list" class="leaderboard-list">
-                <div class="lb-loading">Loading scores...</div>
+        <div class="lb-panel">
+            <div class="lb-header">
+                <h2 class="lb-title">YOUR RESULTS</h2>
+                <p id="lb-subtitle" class="lb-subtitle">Daily Puzzle</p>
             </div>
 
-            <button id="btn-leaderboard-close" class="btn-outline">BACK</button>
+            <div id="leaderboard-content" class="lb-content">
+                <div class="lb-loading">Loading...</div>
+            </div>
+
+            <button id="btn-leaderboard-close" class="btn-primary">DONE</button>
         </div>
     </div>
 
