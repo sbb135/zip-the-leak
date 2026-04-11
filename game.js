@@ -576,14 +576,30 @@
     }
 
     // =========================================================================
-    // SHARE — includes app URL and score in the LinkedIn post
+    // SHARE — includes app URL, score, and leak education
     // =========================================================================
     function shareToLinkedIn() {
         const time = state.finalTime.toFixed(1);
         const stats = loadStats();
         const dayInfo = state.mode === 'daily' ? `Daily Puzzle #${state.dayNum}` : 'Practice';
 
-        const text = `🩹 Zip the Leak — ${dayInfo}\n\nI sealed all 8 insurance leaks in ${time} seconds! Can you beat my time?\n\n🔗 Play now: ${APP_URL}\n\n"Patients don't need more skin in the game. They need the leaks fixed."\n\n🔥 Streak: ${stats.streak || 0} days | Best: ${stats.best.toFixed(1)}s\n\n#NoPatientLeftBehind #FixInsurance`;
+        const leakList = LEAK_LABELS.map((l, i) => `${i + 1}. ${l.label}`).join('\n');
+
+        const text = `🩹 Zip the Leak — ${dayInfo}
+
+I sealed all 8 insurance leaks in ${time} seconds!
+
+These are the 8 leaks that delay treatment for patients:
+${leakList}
+
+Can you fix them faster than I did? 👇
+🔗 ${APP_URL}
+
+🔥 Streak: ${stats.streak || 0} days | Best: ${stats.best.toFixed(1)}s
+
+"Patients don't need more skin in the game. They need the leaks fixed."
+
+#NoPatientLeftBehind #FixInsurance #NPLB`;
 
         navigator.clipboard.writeText(text).catch(() => {});
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`, '_blank');
