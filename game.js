@@ -579,9 +579,10 @@
     // SHARE — includes app URL, score, and leak education
     // =========================================================================
     function shareToLinkedIn() {
-        const time = state.finalTime.toFixed(1);
         const stats = loadStats();
-        const dayInfo = state.mode === 'daily' ? `Daily Puzzle #${state.dayNum}` : 'Practice';
+        const time = (state.finalTime > 0 ? state.finalTime : (stats.todayTime || 0)).toFixed(1);
+        const dayInfo = state.mode === 'daily' ? `Daily Puzzle #${state.dayNum}` : `Daily Puzzle #${getDailyPuzzle().dayNum}`;
+        const best = stats.best ? stats.best.toFixed(1) : time;
 
         const leakList = LEAK_LABELS.map((l, i) => `${i + 1}. ${l.label}`).join('\n');
 
@@ -595,7 +596,7 @@ ${leakList}
 Can you fix them faster than I did? 👇
 🔗 ${APP_URL}
 
-🔥 Streak: ${stats.streak || 0} days | Best: ${stats.best.toFixed(1)}s
+🔥 Streak: ${stats.streak || 0} days | Best: ${best}s
 
 "Patients don't need more skin in the game. They need the leaks fixed."
 
