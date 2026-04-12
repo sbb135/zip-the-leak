@@ -144,6 +144,9 @@ html, body {
     font-size: 11px; font-weight: 800; font-family: var(--display);
     flex-shrink: 0;
 }
+/* Policy failures list starts at 7, uses gold bullets */
+.legend-list[start="7"] { counter-reset: leak 6; }
+.legend-list[start="7"] li strong::before { background: var(--gold); }
 .legend-list li span { font-size: 11px; color: var(--muted); line-height: 1.4; padding-left: 30px; }
 
 .legend-course-card {

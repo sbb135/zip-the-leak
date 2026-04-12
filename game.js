@@ -11,7 +11,7 @@
     const NUM_LEAKS = 8;
     const LAUNCH_DATE = '2026-04-09';
     const STORAGE_KEY = 'zip-the-leak-stats-v2';
-    const APP_URL = 'https://nplb-zip-the-leak.vercel.app';
+    const APP_URL = 'https://nplb-zip-the-leak-fix-insurance.vercel.app';
 
     // Exact labels as specified — these appear on the grid and in the legend
     const LEAK_LABELS = [
