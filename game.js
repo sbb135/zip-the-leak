@@ -609,9 +609,7 @@ Can you fix them faster than I did? 👇
 
 🔥 Streak: ${stats.streak || 0} days | Best: ${best}s
 
-"Patients don't need more skin in the game. They need the leaks fixed."
-
-#NoPatientLeftBehind #FixInsurance #NPLB`;
+"Patients don't need more skin in the game. They need the leaks fixed."`;
 
         // Open LinkedIn FIRST (must be synchronous from click to avoid popup block)
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(APP_URL)}`, '_blank');
