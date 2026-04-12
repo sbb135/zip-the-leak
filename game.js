@@ -251,6 +251,7 @@
                 if (state.leakCells[k]) {
                     const leak = state.leakCells[k];
                     cell.classList.add('leak-node');
+                    if (leak.num > 6) cell.classList.add('policy-leak');
                     if (leak.num === 1) cell.classList.add('next-target');
                     cell.innerHTML = `<div class="leak-marker"><div class="leak-number">${leak.num}</div></div>`;
                 }

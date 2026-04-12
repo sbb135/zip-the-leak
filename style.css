@@ -262,6 +262,10 @@ html, body {
     box-shadow: 0 2px 12px rgba(224,116,96,.3);
     transition: all .25s; z-index: 2;
 }
+.grid-cell.policy-leak .leak-number {
+    background: var(--gold);
+    box-shadow: 0 2px 12px rgba(217,178,72,.35);
+}
 .grid-cell.leak-node.sealed .leak-number {
     background: var(--green);
     box-shadow: 0 2px 12px rgba(16,185,129,.35);
