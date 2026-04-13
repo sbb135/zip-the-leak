@@ -251,7 +251,7 @@
                 if (state.leakCells[k]) {
                     const leak = state.leakCells[k];
                     cell.classList.add('leak-node');
-                    if (leak.num > 6) cell.classList.add('policy-leak');
+
                     if (leak.num === 1) cell.classList.add('next-target');
                     cell.innerHTML = `<div class="leak-marker"><div class="leak-number">${leak.num}</div></div>`;
                 }
@@ -574,8 +574,7 @@
             .sort((a, b) => a.num - b.num)
             .map(l => {
                 const sealed = l.num <= state.sealedCount ? ' sealed' : '';
-                const category = l.num > 6 ? ' policy' : '';
-                return `<div class="legend-bar-item${sealed}${category}"><span class="legend-bar-num">${l.num}</span><span class="legend-bar-label">${l.label}</span></div>`;
+                return `<div class="legend-bar-item${sealed}"><span class="legend-bar-num">${l.num}</span><span class="legend-bar-label">${l.label}</span></div>`;
             })
             .join('');
     }
@@ -590,19 +589,23 @@
         const best = stats.best ? stats.best.toFixed(1) : time;
 
         const insuranceLeaks = LEAK_LABELS.slice(0, 6).map((l, i) => `${i + 1}. ${l.label}`).join('\n');
-        const policyFailures = LEAK_LABELS.slice(6).map((l, i) => `${i + 7}. ${l.label}`).join('\n');
+        const innovationLeak = `7. ${LEAK_LABELS[6].label}`;
+        const genericizationLeak = `8. ${LEAK_LABELS[7].label}`;
 
         const text = `🩹 Zip the Leak — ${dayInfo}
 
-I sealed all 8 insurance leaks in ${time} seconds!
+I sealed all 8 leaks in ${time} seconds!
 
-These are the 8 leaks that delay treatment for insured patients:
+Why insured patients still face costs proper insurance was supposed to prevent:
 
 INSURANCE LEAKS
 ${insuranceLeaks}
 
-POLICY FAILURES
-${policyFailures}
+INNOVATION LEAK
+${innovationLeak}
+
+GENERICIZATION LEAK
+${genericizationLeak}
 
 Can you fix them faster than I did? 👇
 🔗 ${APP_URL}

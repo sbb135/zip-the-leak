@@ -144,10 +144,15 @@ html, body {
     font-size: 11px; font-weight: 800; font-family: var(--display);
     flex-shrink: 0;
 }
-/* Policy failures list starts at 7, uses gold bullets */
+/* Policy failures list starts at 7 or 8, uses same coral bullets */
 .legend-list[start="7"] { counter-reset: leak 6; }
-.legend-list[start="7"] li strong::before { background: var(--gold); }
+.legend-list[start="8"] { counter-reset: leak 7; }
 .legend-list li span { font-size: 11px; color: var(--muted); line-height: 1.4; padding-left: 30px; }
+
+.legend-cat-sub {
+    font-size: 11px; color: var(--muted); text-align: left;
+    margin: -4px 0 10px 0; line-height: 1.4;
+}
 
 .legend-course-card {
     background: rgba(224,116,96,.08);
@@ -262,10 +267,7 @@ html, body {
     box-shadow: 0 2px 12px rgba(224,116,96,.3);
     transition: all .25s; z-index: 2;
 }
-.grid-cell.policy-leak .leak-number {
-    background: var(--gold);
-    box-shadow: 0 2px 12px rgba(217,178,72,.35);
-}
+
 .grid-cell.leak-node.sealed .leak-number {
     background: var(--green);
     box-shadow: 0 2px 12px rgba(16,185,129,.35);
@@ -325,7 +327,7 @@ html, body {
     font-size: 9px; font-weight: 800; font-family: var(--display);
     flex-shrink: 0;
 }
-.legend-bar-item.policy .legend-bar-num { background: var(--gold); }
+
 .legend-bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Footer */
@@ -521,7 +523,7 @@ html, body {
 }
 .legend-category:first-of-type { margin-top: 0; }
 .legend-cat-leak { color: var(--coral); }
-.legend-cat-policy { color: var(--gold); }
+
 /* ===================================================
    RESPONSIVE
    =================================================== */
